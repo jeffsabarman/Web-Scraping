@@ -1,17 +1,43 @@
 #Import Packages
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
+import time
 
-#Scrap IMBD review from url link
-ans = input("What movie do you want to watch?\nJust give me the URL from IMDB : ")
+movie = input("What movie or tv shows do you want to watch? : ")
+
+#Set the web browser
+driver = webdriver.Chrome(executable_path=r"C:\Users\asus liberty\PycharmProjects\Web Scraping\Browser\chromedriver.exe")
+
+#Go to Google
+driver.get("https://www.google.com/")
+
+#Enter the keyword
+driver.find_element_by_name("q").send_keys(movie + " imdb")
+time.sleep(1)
+
+#Click the google search button
+driver.find_element_by_name("btnK").send_keys(Keys.ENTER)
+time.sleep(1)
+
+#Click the link
+driver.implicitly_wait(20)
+driver.find_element_by_class_name("r").click()
+driver.implicitly_wait(20)
+
+#Click the user reviews
+driver.find_element_by_xpath("/html/body/div[3]/div/div[2]/div[5]/div[1]/div/div/div[1]/div[1]/div[1]/a[3]").click()
+
+#Scrap IMBD review
+ans = driver.current_url
 page = requests.get(ans)
 soup = BeautifulSoup(page.content, "html.parser")
 all = soup.find(id="main")
-# review = all.find_all(class_ = "lister-item mode-detail imdb-user-review collapsable")
-# print(review)
+
 #Get the title of the movie
 all = soup.find(id="main")
 parent = all.find(class_ ="parent")
@@ -65,7 +91,7 @@ print("According to vadersentiemnt, you should :")
 if sentiment1.count('positive') > sentiment1.count('negative'):
     print('WATCH IT!')
 else:
-    print("NOT WATCH IT...")
+    print("DON'T WATCH IT...")
 print('Positive : ', sentiment1.count('positive'))
 print('Negative : ', sentiment1.count('negative'))
 print("")
@@ -73,7 +99,9 @@ print("According to TextBlob, you should :")
 if sentiment2.count('positive') > sentiment2.count('negative'):
     print('WATCH IT!')
 else:
-    print("NOT WATCH IT...")
+    print("DON'T WATCH IT...")
 print('Positive : ', sentiment2.count('positive'))
 print('Negative : ', sentiment2.count('negative'))
 
+#Close the browser
+driver.close()
