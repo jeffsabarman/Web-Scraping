@@ -38,7 +38,7 @@ def send_mail():
     server.starttls()
     server.ehlo()
 
-    server.login("jeffsabarman@gmail.com", "lyhpjllfvnqubwbn")
+    server.login("jeffsabarman@gmail.com", "yourpassword")
 
     subject = "Price fell down! How cool is this!"
     body = "Check the amazon link below!, The logitech MX Master 3 price" \
